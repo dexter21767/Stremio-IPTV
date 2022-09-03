@@ -5,24 +5,28 @@ const regions = require('./regions.json');
 async function getm3u(region) {
 
     url = regions[region].url;
-    console.log(url)
-    var m3u8 = (await axios.get(url)).data;
-    var array = m3u(m3u8);
+    if (url) {
+        console.log(url)
+        var m3u8 = (await axios.get(url)).data;
+        var array = m3u(m3u8);
 
-    var arr = [];
-    var n = 0;
-    for (i = 0; i < array.length; i = i + 2) {
-        var name = Object.keys(array[i].EXTINF)[1];
-        var url = array[(i + 1)];
-        arr.push({
-            id: "iptv_id:" + region + ":" + n,
-            name: name,
-            type: "tv",
-            url: url
-        });
-        n++;
+        var arr = [];
+        var n = 0;
+        for (i = 0; i < array.length; i = i + 2) {
+            var name = Object.keys(array[i].EXTINF)[1];
+            var url = array[(i + 1)];
+            arr.push({
+                id: "iptv_id:" + region + ":" + n,
+                name: name,
+                type: "tv",
+                url: url
+            });
+            n++;
+        }
+        return arr
+    } else {
+        return;
     }
-    return arr
 }
 
 async function catalog(region) {
