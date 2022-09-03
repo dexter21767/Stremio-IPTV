@@ -1,0 +1,36 @@
+{
+	"id": "community.stremio-iptv",
+    "version": "0.0.1",
+    "name": "Stremio IPTV by dexter21767",
+    "description": "Addon for Internation TV channles (maintained by the community)",
+    "logo": "https://i.imgur.com/b55EPOJ.png",
+	"background":"https://github.com/Stremio/stremio-art/raw/main/originals/Ma.%20Gladyz%20Pagaduan.jpg",
+    "contactEmail": "ahmidiyasser@gmail.com",
+
+    "catalogs": [],
+    "resources": [
+		{
+            "name": "stream",
+            "types": [
+				"tv"
+            ],
+            "idPrefixes": [
+				"iptv_id"
+            ]
+        }, 
+		{
+			"name": "meta",
+			"types": [
+               "tv"
+            ],
+			"idPrefixes": ["iptv_id"]
+		}
+    ],
+    "types": [
+		"tv"
+    ],
+    "behaviorHints": {
+        "configurable": false,
+        "configurationRequired": false
+    }
+}
