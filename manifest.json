@@ -1,6 +1,6 @@
 {
 	"id": "community.stremio-iptv",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "name": "Stremio IPTV by dexter21767",
     "description": "Addon for Internation TV channles (maintained by the community)",
     "logo": "https://i.imgur.com/982WZT3.png",
@@ -30,7 +30,7 @@
 		"tv"
     ],
     "behaviorHints": {
-        "configurable": false,
+        "configurable": true,
         "configurationRequired": false
     }
 }

@@ -1,15 +1,6 @@
 {
-    "ar-iptv": {
-		"name" : "Arabic TV",
-		"url" : "https://raw.githubusercontent.com/ghulammurtazaranajee/iptv_bein-sports/main/iptv%20bein"
-    },
-	"arsports-iptv": {
+	"arsportsiptv": {
 		"name" : "Arabic Sports TV",
 		"url" : "https://raw.githubusercontent.com/ghulammurtazaranajee/iptv_bein-sports/main/iptv%20bein"
-    },
-	"int-iptv": {
-		"name" : "International TV",
-		"url" : "https://raw.githubusercontent.com/ghulammurtazaranajee/iptv_bein-sports/main/iptv%20bein"
     }
-
 }

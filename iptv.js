@@ -3,8 +3,10 @@ const axios = require('axios').default;
 const regions = require('./regions.json');
 
 async function getm3u(region) {
-
-    url = regions[region].url;
+url = regions[region].url;
+return await m3ulist(url,region)
+}
+async function m3ulist(url,region) {
     if (url) {
         console.log(url)
         var m3u8 = (await axios.get(url)).data;
@@ -29,23 +31,47 @@ async function getm3u(region) {
     }
 }
 
-async function catalog(region) {
+async function catalog(region,url) {
+	if(region == "cusiptv")
+	{
+		return (await(m3ulist(url,region)));
+	}else{
     return (await(getm3u(region)));
+	}
 }
 
-async function meta(id) {
+async function meta(id,url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
-    console.log(region, id);
+    console.log('region:',region,'id:', id,'url:',url);
+	
+	if(region == "cusiptv")
+	{
+		console.log('region == "cusiptv"');
+		return (await(m3ulist(url,region)))[id];
+	}
+	
+	else{
+	console.log('region != "cusiptv"');
     return (await(getm3u(region)))[id];
+	}
 }
 
-async function stream(id) {
+async function stream(id,url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
-
+	
+	if(region == "cusiptv")
+	{
+		console.log('region == "cusiptv"');
+		var iptv =  (await(m3ulist(url,region)))[id];
+	}
+	
+	else{
+	console.log('region != "cusiptv"');
     var iptv = (await(getm3u(region)))[id];
-
+	}
+	
     stream = [{
             name: iptv.name,
             description: iptv.name,
