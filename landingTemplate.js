@@ -285,6 +285,7 @@ var scriptHTML =`<script type="text/javascript">
 		 <div class="separator"></div>
          
 		 <label class="label" for="community">Community IPTVs:</label>
+		 <br><h3 class="gives">For anyone that wants to contribute please <a href="mailto:${manifest.contactEmail}">email me</a> or check my  <a href="https://www.reddit.com/r/StremioAddons/comments/x4scnn/iptv_addon/">reddit post</a>.</h3>
 		  ${regionsHTML}
 		  <div class="separator"></div>
 		 
@@ -304,6 +305,11 @@ var scriptHTML =`<script type="text/javascript">
         </div>
         
         <div class="separator"></div>
+		<h3 class="contact">
+		    To contact add-on creator:
+		    <a href="mailto:${manifest.contactEmail}">${manifest.contactEmail}</a>
+		</h3>
+		
       </div>
 	  
 	  
