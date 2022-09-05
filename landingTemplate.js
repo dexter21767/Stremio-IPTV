@@ -309,7 +309,7 @@ var scriptHTML =`<script type="text/javascript">
 		    To contact add-on creator:
 		    <a href="mailto:${manifest.contactEmail}">${manifest.contactEmail}</a>
 		</h3>
-		
+		<div class="separator"></div>
       </div>
 	  
 	  
