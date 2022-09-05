@@ -7,7 +7,9 @@ const iptv = require("./iptv");
 
 var manifest = require("./manifest.json");
 
-const regions = require('./regions.json');
+const regions_ar = require('./regions.json');
+const RootByte = require('./regions-RootByte.json');
+const regions = {...regions_ar, ...RootByte};
 const landingTemplate = require('./landingTemplate');
 
 app.use(cors())

@@ -1,7 +1,7 @@
 {
 	"name": "community.stremio-iptv",
-	"version": "0.0.2",
-	"description": "Addon for Internation TV channles (maintained by the community).",
+	"version": "0.0.3",
+	"description": "Addon for Internation TV channles (maintained by the community) huge thanks for u/RootByte for the lists.",
 	"main": "server.js",
 	"scripts": {
 		"start": "node server.js"
@@ -10,7 +10,9 @@
 		"axios": "^0.27.2",
 		"cors": "^2.8.5",
 		"express": "^4.16.4",
-		"stremio-addon-sdk": "1.1.x",
-		"m3u8-reader": "^1.1.0"
+		"iptv-playlist-parser": "^0.12.1",
+		"m3u8-reader": "^1.1.0",
+		"m3u8-stream-list": "^1.1.0",
+		"stremio-addon-sdk": "1.1.x"
 	}
 }

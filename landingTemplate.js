@@ -12,10 +12,11 @@ html {
 }
 
 html {
-   background-size: auto 100%;
-   background-size: cover;
-   background-position: center center;
-   background-repeat: repeat-y;
+	background: fixed;
+	background-size: auto 100%;
+	background-size: cover;
+	background-position: center center;
+	background-repeat: repeat-y;
 }
 
 body {
@@ -182,7 +183,10 @@ button:active {
 `;
 function landingTemplate(){
 
-const regions = require('./regions.json');
+const regions_ar = require('./regions.json');
+const RootByte = require('./regions-RootByte.json');
+const regions = {...regions_ar, ...RootByte};
+
 
 const manifest = require("./manifest.json");
 var functionHTML =`function generateInstallLink() {
@@ -198,7 +202,7 @@ var scriptHTML =`<script type="text/javascript">
   var regionsHTML = '<br>';
   var i = 0;
   for (let region in regions){  
-	  regionsHTML +=`<input type="checkbox" id="${region}" value="${region}" checked> ${regions[region].name}</input><br>`;
+	  regionsHTML +=`<input type="checkbox" id="${region}" value="${region}"> ${regions[region].name}</input><br>`;
 	  
 	  scriptHTML +=` $('#${region}').click(function() {
 		generateInstallLink()

@@ -1,6 +1,9 @@
-const m3u = require('m3u8-reader');
+const parser = require('iptv-playlist-parser');
 const axios = require('axios').default;
-const regions = require('./regions.json');
+
+const regions_ar = require('./regions.json');
+const RootByte = require('./regions-RootByte.json');
+const regions = {...regions_ar, ...RootByte};
 
 async function getm3u(region) {
 url = regions[region].url;
@@ -10,21 +13,25 @@ async function m3ulist(url,region) {
     if (url) {
         console.log(url)
         var m3u8 = (await axios.get(url)).data;
-        var array = m3u(m3u8);
-
+        var array = (parser.parse(m3u8)).items;
         var arr = [];
-        var n = 0;
-        for (i = 0; i < array.length; i = i + 2) {
-            var name = Object.keys(array[i].EXTINF)[1];
-            var url = array[(i + 1)];
+        for (i = 0; i < array.length; i ++) {
+			if(array[i].http.referrer == "" && array[i].http['user-agent'] == ""){
+				
+            //var name = Object.keys(array[i].EXTINF)[1];
+            //var url = array[(i + 1)];
             arr.push({
-                id: "iptv_id:" + region + ":" + n,
-                name: name,
+                id: "iptv_id:" + region + ":" + i,
+                name: array[i].name,
                 type: "tv",
-                url: url
+				poster: array[i].tvg.logo,
+				posterShape: 'landscape',
+                url: array[i].url
             });
-            n++;
-        }
+        }else{
+			//i=i+2;
+		}
+		}
         return arr
     } else {
         return;
