@@ -6,6 +6,7 @@ const RootByte = require('./regions-RootByte.json');
 const regions = {...regions_ar, ...RootByte};
 
 async function getm3u(region) {
+	console.log(region);
 url = regions[region].url;
 return await m3ulist(url,region)
 }
@@ -39,7 +40,7 @@ async function m3ulist(url,region) {
 }
 
 async function catalog(region,url) {
-	if(region == "cusiptv")
+	if(region == "customiptv")
 	{
 		return (await(m3ulist(url,region)));
 	}else{
@@ -52,14 +53,14 @@ async function meta(id,url) {
     id = id.split(":")[2];
     console.log('region:',region,'id:', id,'url:',url);
 	
-	if(region == "cusiptv")
+	if(region == "customiptv")
 	{
-		console.log('region == "cusiptv"');
+		console.log('region == "customiptv"');
 		return (await(m3ulist(url,region)))[id];
 	}
 	
 	else{
-	console.log('region != "cusiptv"');
+	console.log('region != "customiptv"');
     return (await(getm3u(region)))[id];
 	}
 }
@@ -68,14 +69,14 @@ async function stream(id,url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
 	
-	if(region == "cusiptv")
+	if(region == "customiptv")
 	{
-		console.log('region == "cusiptv"');
+		console.log('region == "customiptv"');
 		var iptv =  (await(m3ulist(url,region)))[id];
 	}
 	
 	else{
-	console.log('region != "cusiptv"');
+	console.log('region != "customiptv"');
     var iptv = (await(getm3u(region)))[id];
 	}
 	

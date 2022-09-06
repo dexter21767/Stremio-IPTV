@@ -222,7 +222,8 @@ var scriptHTML =`<script type="text/javascript">
   }
   
   
-	 functionHTML +=`providers['regions']=regions.join(',');
+	 functionHTML +=`
+	 providers['regions']=regions.join(',');
 	 providers['costume']=btoa($('#costume').val());
 	 
 	 configurationValue = Object.keys(providers).map(key => key + '=' + providers[key]).join('|');

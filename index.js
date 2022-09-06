@@ -50,7 +50,13 @@ for (let region in regions) {
 app.get('/:configuration?/manifest.json', (req, res) => {
 	console.log("dexter");
 	console.log(manifest.catalogs)
-	var providors = req.params.configuration.split('|')[0].split('=')[1].split(',');
+var providors = req.params.configuration.split('|')[0].split('=');
+
+	if (providors.length >1 && providors[1].length>1){
+	providors = providors[1].split(',');	
+	}else{
+	providors.length = 0;
+	}		
 	var costumURL = atob(req.params.configuration.split('|')[1].split('=')[1]);
 	console.log(costumURL);
 	
@@ -96,8 +102,14 @@ app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
 	console.log(req.params);
 	const { configuration, resource, type, id } = req.params;
 	const extra = req.params.extra ? qs.parse(req.url.split('/').pop().slice(0, -5)) : {}
-  
-	var providors = configuration.split('|')[0].split('=')[1].split(',');
+	
+	var providors = configuration.split('|')[0].split('=')
+	if (providors.length >1 && providors[1].length>1){
+	providors = providors[1].split(',');	
+	}else{
+	providors.length = 0;
+	}			
+		
 	var costumURL = atob(configuration.split('|')[1].split('=')[1]);
 	if(resource == "catalog"){
 	if ((type == "tv")) {
