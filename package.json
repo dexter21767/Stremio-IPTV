@@ -11,8 +11,6 @@
 		"cors": "^2.8.5",
 		"express": "^4.16.4",
 		"iptv-playlist-parser": "^0.12.1",
-		"m3u8-reader": "^1.1.0",
-		"m3u8-stream-list": "^1.1.0",
 		"stremio-addon-sdk": "1.1.x"
 	}
 }
