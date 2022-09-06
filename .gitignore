@@ -1,5 +1,5 @@
 # ignore ALL .log files
 *.log
 /node_modules
-/beamup.json
+beamup.json
 /lib
