@@ -1,6 +1,6 @@
 {
 	"name": "community.stremio-iptv",
-	"version": "0.0.3",
+	"version": "0.0.5",
 	"description": "Addon for Internation TV channles (maintained by the community) huge thanks for u/RootByte for the lists.",
 	"main": "server.js",
 	"scripts": {
@@ -11,6 +11,6 @@
 		"cors": "^2.8.5",
 		"express": "^4.16.4",
 		"iptv-playlist-parser": "^0.12.1",
-		"stremio-addon-sdk": "1.1.x"
+		"stremio-addon-sdk": "latest"
 	}
 }
