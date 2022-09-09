@@ -21,13 +21,13 @@ app.get('/', (_, res) => {
 });
 
 
-app.get('/:configuration?/configure', (req, res) => {
+app.get('/:configuration?/configure', (_, res) => {
 	res.setHeader('content-type', 'text/html');
 	res.end(landingTemplate());
 });
 
 
-app.get('/manifest.json', (req, res) => {
+app.get('/manifest.json', (_, res) => {
 	var i = 0;
 	for (let region in regions_ar) {
 		manifest.catalogs[i] = {

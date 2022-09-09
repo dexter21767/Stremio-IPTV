@@ -11,6 +11,7 @@
 		"cors": "^2.8.5",
 		"express": "^4.16.4",
 		"iptv-playlist-parser": "^0.12.1",
+		"node-cache": "^5.1.2",
 		"stremio-addon-sdk": "latest"
 	}
 }

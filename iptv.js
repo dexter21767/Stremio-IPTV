@@ -1,6 +1,9 @@
 const parser = require('iptv-playlist-parser');
 const axios = require('axios').default;
-var cache = require('./memoryCache');
+//var cache = require('./memoryCache');
+const NodeCache = require( "node-cache" );
+const cache = new NodeCache( { stdTTL: 43200, checkperiod: 3600 } );
+
 
 const regions_ar = require('./regions.json');
 const RootByte = require('./regions-RootByte.json');
@@ -19,9 +22,6 @@ function m3ulist(url, region) {
             var arr = [];
             for (i = 0; i < array.length; i++) {
                 if (array[i].http.referrer == "" && array[i].http['user-agent'] == "") {
-
-                    //var name = Object.keys(array[i].EXTINF)[1];
-                    //var url = array[(i + 1)];
                     arr.push({
                         id: "iptv_id:" + region + ":" + i,
                         name: array[i].name,
@@ -40,16 +40,21 @@ function m3ulist(url, region) {
 }
 
 async function catalog(region, url) {
-    var cached_value = cache.get(region);
-    if (cached_value) {
-        return cached_value
-    } else {
-        if (region == "customiptv") {
+    if (region == "customiptv") {
+        var cached_value = cache.get(url);
+        if (cached_value) {
+            return cached_value;
+        } else {
             var cat = await (m3ulist(url, region));
             if (cat.length > 1) {
-                cache.set(region, cat);
+                cache.set(url, cat);
             }
             return cat;
+        }
+    } else {
+        var cached_value = cache.get(region);
+        if (cached_value) {
+            return cached_value;
         } else {
             var cat = await (getm3u(region));
             if (cat.length > 1) {
@@ -63,50 +68,14 @@ async function catalog(region, url) {
 async function meta(id, url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
-    console.log('region:', region, 'id:', id, 'url:', url);
-
-    var cached_value = cache.get(region);
-    if (cached_value) {
-        return cached_value[id];
-    } else {
-        if (region == "customiptv") {
-            var cat = await (m3ulist(url, region));
-            if (cat.length > 1) {
-                cache.set(region, cat);
-            }
-            return cat[id];
-        } else {
-            var cat = await (getm3u(region));
-            if (cat.length > 1) {
-                cache.set(region, cat);
-            }
-            return cat[id];
-        }
-    }
+    return (await catalog(region, url))[id];
 }
 
 async function stream(id, url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
-
-    var cached_value = cache.get(region);
-    if (cached_value) {
-        var iptv = cached_value[id];
-    } else {
-        if (region == "customiptv") {
-            var cat = await (m3ulist(url, region));
-            if (cat.length > 1) {
-                cache.set(region, cat);
-            }
-            var iptv = cat[id];
-        } else {
-            var cat = await (getm3u(region));
-            if (cat.length > 1) {
-                cache.set(region, cat);
-            }
-            var iptv = cat[id];
-        }
-    }
+    var iptv = (await catalog(region, url))[id];
+    
     stream = [{
         name: iptv.name,
         description: iptv.name,

@@ -180,80 +180,36 @@ button:active {
   background-color: rgb(255, 255, 255);
   box-shadow: 0 0.5vh 1vh rgba(0, 0, 0, 0.2);
 }
+button.multiselect.dropdown-toggle.btn.btn-default {
+   height: auto;
+}
 `;
-function landingTemplate(){
+function landingTemplate() {
 
-const regions_ar = require('./regions.json');
-const RootByte = require('./regions-RootByte.json');
-const regions = {...regions_ar, ...RootByte};
+   const regions_ar = require('./regions.json');
+   const RootByte = require('./regions-RootByte.json');
+   const regions = { ...regions_ar, ...RootByte };
 
 
-const manifest = require("./manifest.json");
-var functionHTML =`function generateInstallLink() {
-			  var providers = {};
-			  var regions = [];`;
+   const manifest = require("./manifest.json");
 
 
 
-var scriptHTML =`<script type="text/javascript">
-	  
-          $(document).ready(function() {`;
-		  
-  var regionsHTML = '<br>';
-  var i = 0;
-  for (let region in regions){  
-	  regionsHTML +=`<input type="checkbox" id="${region}" value="${region}"> ${regions[region].name}</input><br>`;
-	  
-	  scriptHTML +=` $('#${region}').click(function() {
-		generateInstallLink()
-	});`;
-			  
-	functionHTML +=` if($('#${region}').is(':checked')){
-	regions.push($('#${region}').val());
-	
-    
-	}else{
-		regions = regions.filter(function(value, index, arr){ 
-        return value != $('#${region}').val();
-	})	
-	}
-	;`;
-	i++;
-  }
-  
-  
-	 functionHTML +=`
-	 providers['regions']=regions.join(',');
-	 providers['costume']=btoa($('#costume').val());
-	 
-	 configurationValue = Object.keys(providers).map(key => key + '=' + providers[key]).join('|');
 
 
+   var regionsHTML = '';
+   var i = 0;
+   for (let region in regions) {
+      regionsHTML += `<option value="${region}">${regions[region].name}</option>`;
+      i++;
+   }
 
-	console.log(configurationValue);
-	 const configuration = configurationValue && configurationValue.length ? '/' + configurationValue : '';
-	 const location = window.location.host + configuration + '/manifest.json'
-              navigator.clipboard.writeText('https://' + location);
-              installLink.href = 'stremio://' + location;
-	 }`
-  
-  
-  scriptHTML += `
-		  $('#costume').change(function() {
-		  generateInstallLink()
-		});
-			  generateInstallLink();
-          });`
-  
-  
-  
-	
-	const stylizedTypes = manifest.types
+   const stylizedTypes = manifest.types
       .map(t => t[0].toUpperCase() + t.slice(1) + (t !== 'series' ? 's' : ''));
-	  
-	  
 
-  return `
+
+
+   return `
    <!DOCTYPE html>
    <html style="background-image: url(${manifest.background});">
 
@@ -288,12 +244,15 @@ var scriptHTML =`<script type="text/javascript">
          </ul>
 		 
 		 <div class="separator"></div>
-         
+      
 		 <label class="label" for="community">Community IPTVs:</label>
 		 <br><h3 class="gives">For anyone that wants to contribute please <a href="mailto:${manifest.contactEmail}">email me</a> or check my  <a href="https://www.reddit.com/r/StremioAddons/comments/x4scnn/iptv_addon/">reddit post</a>.</h3>
-		  ${regionsHTML}
+       <div class="separator"></div>
+       <select id="regions" class="input" name="regions[]" multiple="multiple">
+         ${regionsHTML}
+       </select> 
 		  <div class="separator"></div>
-		 
+
 		  <label class="label" for="costume">Costume M3U8 list:</label>
 		 <br>
 			<input type="url" id="costume">
@@ -318,9 +277,35 @@ var scriptHTML =`<script type="text/javascript">
       </div>
 	  
 	  
-		  ${scriptHTML}
+      <script type="text/javascript">
+	  
+      $(document).ready(function() {
+        $('#regions').multiselect({ 
+           nonSelectedText: 'All regions',
+           onChange: () => generateInstallLink()
+       });
+    $('#costume').change(function() {
+    generateInstallLink()
+  });
+       generateInstallLink();
+      });
           
-		  ${functionHTML}
+      function generateInstallLink() {
+         var providers = {};
+      const regionsValue = $('#regions').val().join(',') || ''; 
+      const regions = regionsValue.length && regionsValue;
+      providers['regions']=regions;
+       providers['costume']=btoa($('#costume').val());
+       configurationValue = Object.keys(providers).map(key => key + '=' + providers[key]).join('|');
+   
+   
+   
+      console.log(configurationValue);
+       const configuration = configurationValue && configurationValue.length ? '/' + configurationValue : '';
+       const location = window.location.host + configuration + '/manifest.json'
+                 navigator.clipboard.writeText('https://' + location);
+                 installLink.href = 'stremio://' + location;
+       }
 		  
           
       </script>
