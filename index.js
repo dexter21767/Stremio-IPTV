@@ -48,8 +48,6 @@ app.get('/manifest.json', (_, res) => {
 
 
 app.get('/:configuration?/manifest.json', (req, res) => {
-	console.log("dexter");
-	console.log(manifest.catalogs)
 	var providors = req.params.configuration.split('|')[0].split('=');
 
 	if (providors.length > 1 && providors[1].length > 1) {
@@ -58,8 +56,6 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 		providors.length = 0;
 	}
 	var costumURL = atob(req.params.configuration.split('|')[1].split('=')[1]);
-	console.log(costumURL);
-
 	var c = 0;
 
 	if (costumURL) {
@@ -72,7 +68,6 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 		};
 		c++;
 	}
-
 
 	for (let i = 0; i < providors.length; i++) {
 
@@ -101,7 +96,6 @@ app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
 
 	console.log(req.params);
 	const { configuration, resource, type, id } = req.params;
-	//const extra = req.params.extra ? qs.parse(req.url.split('/').pop().slice(0, -5)) : {}
 	if (configuration !== undefined) {
 		var providors = configuration.split('|')[0].split('=')
 		if (providors.length > 1 && providors[1].length > 1) {
@@ -109,7 +103,9 @@ app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
 		} else {
 			providors.length = 0;
 		}
+		if(configuration.split('|')[1].split('=').length>1){
 		var costumURL = atob(configuration.split('|')[1].split('=')[1]);
+	}
 	}
 
 	if (resource == "catalog") {
