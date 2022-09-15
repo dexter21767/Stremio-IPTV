@@ -10,6 +10,7 @@ var manifest = require("./manifest.json");
 const regions_ar = require('./regions.json');
 const RootByte = require('./regions-RootByte.json');
 const regions = { ...regions_ar, ...RootByte };
+
 const landingTemplate = require('./landingTemplate');
 
 app.use(cors())
@@ -62,7 +63,7 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 		manifest.catalogs[c] = {
 			"type": "tv",
 
-			"id": "customiptv",
+			"id": "iptv_id:customiptv",
 
 			"name": "Custom IPTV"
 		};
@@ -74,7 +75,7 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 		manifest.catalogs[c] = {
 			"type": "tv",
 
-			"id": providors[i],
+			"id": "iptv_id:" +providors[i],
 
 			"name": regions[providors[i]].name
 		};
@@ -89,13 +90,14 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 });
 
 
-app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
+app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 
 	res.setHeader('Cache-Control', 'max-age=86400,staleRevalidate=stale-while-revalidate, staleError=stale-if-error, public');
 	res.setHeader('Content-Type', 'application/json');
 
 	console.log(req.params);
-	const { configuration, resource, type, id } = req.params;
+	let { configuration, resource, type, id } = req.params;
+	
 	if (configuration !== undefined) {
 		var providors = configuration.split('|')[0].split('=')
 		if (providors.length > 1 && providors[1].length > 1) {
@@ -110,7 +112,9 @@ app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
 
 	if (resource == "catalog") {
 		if ((type == "tv")) {
-			iptv.catalog(id, costumURL)
+			region = id.split(":")[1];
+			console.log("catalog");
+			iptv.catalog(region, costumURL)
 				.then((metas) => {
 					res.send(JSON.stringify({ metas }));
 					res.end();
@@ -119,6 +123,7 @@ app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
 	}
 	else if (resource == "meta") {
 		if ((type == "tv")) {
+			console.log("meta");
 			console.log('costumURL', costumURL);
 			iptv.meta(id, costumURL)
 				.then((meta) => {
@@ -131,6 +136,7 @@ app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
 
 	else if (resource == "stream") {
 		if ((type == "tv")) {
+			console.log("stream");
 			iptv.stream(id, costumURL)
 				.then((stream) => {
 					console.log(stream)

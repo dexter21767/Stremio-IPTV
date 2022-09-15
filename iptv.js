@@ -1,8 +1,8 @@
 const parser = require('iptv-playlist-parser');
 const axios = require('axios').default;
 //var cache = require('./memoryCache');
-const NodeCache = require( "node-cache" );
-const cache = new NodeCache( { stdTTL: 43200, checkperiod: 3600 } );
+const NodeCache = require("node-cache");
+const cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
 
 const regions_ar = require('./regions.json');
@@ -10,7 +10,7 @@ const RootByte = require('./regions-RootByte.json');
 const regions = { ...regions_ar, ...RootByte };
 
 async function getm3u(region) {
-    console.log(region);
+    console.log("region",region);
     url = regions[region].url;
     return await m3ulist(url, region)
 }
@@ -21,16 +21,30 @@ function m3ulist(url, region) {
             var array = (parser.parse(data.data)).items;
             var arr = [];
             for (i = 0; i < array.length; i++) {
-                if (array[i].http.referrer == "" && array[i].http['user-agent'] == "") {
-                    arr.push({
-                        id: "iptv_id:" + region + ":" + i,
-                        name: array[i].name,
-                        type: "tv",
-                        poster: array[i].tvg.logo,
-                        posterShape: 'landscape',
-                        url: array[i].url
-                    });
+
+                let tv = {
+                    id: "iptv_id:" + region + ":" + i,
+                    name: array[i].name,
+                    type: "tv",
+                    poster: array[i].tvg.logo,
+                    posterShape: 'landscape',
+                    url: array[i].url
                 }
+                if (array[i].http['user-agent'] || array[i].http['http-referrer']) {
+                    tv.behaviorHints = {};
+                    tv.behaviorHints.notWebReady = true;
+                    tv.behaviorHints.proxyHeaders = {};
+                    tv.behaviorHints.proxyHeaders.request = {};
+                    if (array[i].http['http-referrer']) {
+                        tv.behaviorHints.proxyHeaders.request['referrer'] = array[i].http['http-referrer'];
+                    }
+                    if (array[i].http['user-agent']) {
+                        tv.behaviorHints.proxyHeaders.request['User-Agent'] = array[i].http['user-agent'];
+                    }
+                    console.log(tv);
+                }
+
+                arr.push(tv);
             }
             return arr
         }).catch(error => { console.error(error) })
@@ -40,10 +54,10 @@ function m3ulist(url, region) {
 }
 
 async function catalog(region, url) {
+    console.log(region)
     if (region == "customiptv") {
-        var cached_value = cache.get(url);
-        if (cached_value) {
-            return cached_value;
+        if (cache.get(url)) {
+            return cache.get(url);
         } else {
             var cat = await (m3ulist(url, region));
             if (cat.length > 1) {
@@ -52,9 +66,8 @@ async function catalog(region, url) {
             return cat;
         }
     } else {
-        var cached_value = cache.get(region);
-        if (cached_value) {
-            return cached_value;
+        if ( cache.get(region)) {
+            return  cache.get(region);
         } else {
             var cat = await (getm3u(region));
             if (cat.length > 1) {
@@ -68,24 +81,24 @@ async function catalog(region, url) {
 async function meta(id, url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
-    return (await catalog(region, url))[id];
+    console.log(region,id)
+    return (await catalog(region, url).catch(error=>console.error(error)))[id];
 }
 
 async function stream(id, url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
-    var iptv = (await catalog(region, url))[id];
-    
-    stream = [{
+    var iptv = (await catalog(region, url).catch(error=>console.error(error)))[id];
+
+    let stream = {
         name: iptv.name,
         description: iptv.name,
-        url: iptv.url,
-        behaviorHints: {
-            notWebReady: true,
-        }
+        url: iptv.url
+    };
+    if(iptv["behaviorHints"]){
+        stream["behaviorHints"]=iptv["behaviorHints"];
     }
-    ];
-    return stream;
+    return [stream];
 }
 
 module.exports = {

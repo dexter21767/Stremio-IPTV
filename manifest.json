@@ -1,6 +1,6 @@
 {
 	"id": "community.stremio-iptv",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "name": "Stremio IPTV by dexter21767",
     "description": "Addon for Internation TV channles (maintained by the community) huge thanks for u/RootByte for the lists.",
     "logo": "https://i.imgur.com/982WZT3.png",
@@ -15,7 +15,7 @@
 				"tv"
             ],
             "idPrefixes": [
-				"iptv_id"
+				"iptv_id:"
             ]
         }, 
 		{
@@ -23,7 +23,7 @@
 			"types": [
                "tv"
             ],
-			"idPrefixes": ["iptv_id"]
+			"idPrefixes": ["iptv_id:"]
 		}
     ],
     "types": [
