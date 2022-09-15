@@ -1,16 +1,13 @@
 const parser = require('iptv-playlist-parser');
 const axios = require('axios').default;
-//var cache = require('./memoryCache');
 const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
 
-const regions_ar = require('./regions.json');
-const RootByte = require('./regions-RootByte.json');
-const regions = { ...regions_ar, ...RootByte };
+const regions = require('./regions.json');
 
 async function getm3u(region) {
-    console.log("region",region);
+    console.log("region", region);
     url = regions[region].url;
     return await m3ulist(url, region)
 }
@@ -53,51 +50,72 @@ function m3ulist(url, region) {
         return;
     }
 }
+async function get_iptv(region, url) {
+    if (region == "customiptv") {
+        if (cache.get(url) !== undefined) {
+            var iptv = cache.get(url);
+        } else {
+            var iptv = await (m3ulist(url, region));
+            if (iptv.length > 1) {
+                cache.set(url, iptv);
+            }
+        }
+    } else {
+        if (cache.get(region) !== undefined) {
+            var iptv = cache.get(region);
+        } else {
+            var iptv = await (getm3u(region));
+            if (iptv.length > 1) {
+                cache.set(region, iptv);
+            }
+        }
+    }
+    return iptv;
+}
 
 async function catalog(region, url) {
     console.log(region)
-    if (region == "customiptv") {
-        if (cache.get(url) !== undefined) {
-            return cache.get(url);
-        } else {
-            var cat = await (m3ulist(url, region));
-            if (cat.length > 1) {
-                cache.set(url, cat);
-            }
-            return cat;
-        }
-    } else {
-        if ( cache.get(region) !== undefined) {
-            return  cache.get(region);
-        } else {
-            var cat = await (getm3u(region));
-            if (cat.length > 1) {
-                cache.set(region, cat);
-            }
-            return cat;
-        }
+    const metas = [];
+    var iptv = await get_iptv(region, url).catch(error => console.error(error));
+    for (let i = 0; i < iptv.length; i++) {
+        metas.push({
+            id: iptv[i].id,
+            name: iptv[i].name,
+            type: "tv",
+            poster: iptv[i].poster,
+            posterShape: 'landscape'
+        });
     }
+    return metas;
 }
 
 async function meta(id, url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
-    console.log(region,id)
-    return (await catalog(region, url).catch(error=>console.error(error)))[id];
+    console.log(region, id)
+    var iptv = (await get_iptv(region, url).catch(error => console.error(error)))[id];
+    let meta = {
+        name: iptv.name,
+        id: iptv.id,
+        name: iptv.name,
+        type: "tv",
+        background: iptv.background
+    };
+    return meta;
 }
 
 async function stream(id, url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
-    var iptv = (await catalog(region, url).catch(error=>console.error(error)))[id];
+    var iptv = (await get_iptv(region, url).catch(error => console.error(error)))[id];
 
     let stream = {
         name: iptv.name,
         description: iptv.name,
         url: iptv.url
     };
-    if(iptv["behaviorHints"]){
-        stream["behaviorHints"]=iptv["behaviorHints"];
+    if (iptv["behaviorHints"]) {
+        stream["behaviorHints"] = iptv["behaviorHints"];
     }
     return [stream];
 }

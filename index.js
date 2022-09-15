@@ -7,9 +7,7 @@ const iptv = require("./iptv");
 
 var manifest = require("./manifest.json");
 
-const regions_ar = require('./regions.json');
-const RootByte = require('./regions-RootByte.json');
-const regions = { ...regions_ar, ...RootByte };
+const regions = require('./regions.json');
 
 const landingTemplate = require('./landingTemplate');
 
@@ -30,13 +28,13 @@ app.get('/:configuration?/configure', (_, res) => {
 
 app.get('/manifest.json', (_, res) => {
 	var i = 0;
-	for (let region in regions_ar) {
+	for (let region in regions) {
 		manifest.catalogs[i] = {
 			"type": "tv",
 
-			"id": region,
+			"id": "stremio_iptv_id:" + region,
 
-			"name": regions_ar[region].name
+			"name": regions[region].name
 		};
 		i++;
 	};
@@ -75,7 +73,7 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 		manifest.catalogs[c] = {
 			"type": "tv",
 
-			"id": "stremio_iptv_id:" +providors[i],
+			"id": "stremio_iptv_id:" + providors[i],
 
 			"name": regions[providors[i]].name
 		};
@@ -97,7 +95,7 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 
 	console.log(req.params);
 	let { configuration, resource, type, id } = req.params;
-	
+
 	if (configuration !== undefined) {
 		var providors = configuration.split('|')[0].split('=')
 		if (providors.length > 1 && providors[1].length > 1) {
@@ -105,20 +103,21 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 		} else {
 			providors.length = 0;
 		}
-		if(configuration.split('|')[1].split('=').length>1){
-		var costumURL = atob(configuration.split('|')[1].split('=')[1]);
-	}
+		if (configuration.split('|')[1].split('=').length > 1) {
+			var costumURL = atob(configuration.split('|')[1].split('=')[1]);
+		}
 	}
 
 	if (resource == "catalog") {
 		if ((type == "tv")) {
 			region = id.split(":")[1];
-			console.log("catalog",region);
+			console.log('id', id)
+			console.log("catalog", region);
 			iptv.catalog(region, costumURL)
 				.then((metas) => {
 					res.send(JSON.stringify({ metas }));
 					res.end();
-				}).catch(error=>console.error(error));
+				}).catch(error => console.error(error));
 		}
 	}
 	else if (resource == "meta") {
@@ -130,19 +129,19 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 					console.log(meta)
 					res.send(JSON.stringify({ meta }));
 					res.end();
-				}).catch(error=>console.error(error));
+				}).catch(error => console.error(error));
 		}
 	}
 
 	else if (resource == "stream") {
 		if ((type == "tv")) {
-			console.log("stream",id);
+			console.log("stream", id);
 			iptv.stream(id, costumURL)
 				.then((stream) => {
 					console.log(stream)
 					res.send(JSON.stringify({ streams: stream }));
 					res.end();
-				}).catch(error=>console.error(error));
+				}).catch(error => console.error(error));
 		}
 	} else {
 		res.end();
