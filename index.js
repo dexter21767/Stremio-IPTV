@@ -113,36 +113,36 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 	if (resource == "catalog") {
 		if ((type == "tv")) {
 			region = id.split(":")[1];
-			console.log("catalog");
+			console.log("catalog",region);
 			iptv.catalog(region, costumURL)
 				.then((metas) => {
 					res.send(JSON.stringify({ metas }));
 					res.end();
-				});
+				}).catch(error=>console.error(error));
 		}
 	}
 	else if (resource == "meta") {
 		if ((type == "tv")) {
-			console.log("meta");
+			console.log("meta", id);
 			console.log('costumURL', costumURL);
 			iptv.meta(id, costumURL)
 				.then((meta) => {
 					console.log(meta)
 					res.send(JSON.stringify({ meta }));
 					res.end();
-				});
+				}).catch(error=>console.error(error));
 		}
 	}
 
 	else if (resource == "stream") {
 		if ((type == "tv")) {
-			console.log("stream");
+			console.log("stream",id);
 			iptv.stream(id, costumURL)
 				.then((stream) => {
 					console.log(stream)
 					res.send(JSON.stringify({ streams: stream }));
 					res.end();
-				});
+				}).catch(error=>console.error(error));
 		}
 	} else {
 		res.end();

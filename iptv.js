@@ -28,7 +28,8 @@ function m3ulist(url, region) {
                     type: "tv",
                     poster: array[i].tvg.logo,
                     posterShape: 'landscape',
-                    url: array[i].url
+                    url: array[i].url,
+                    background: array[i].tvg.logo
                 }
                 if (array[i].http['user-agent'] || array[i].http['http-referrer']) {
                     tv.behaviorHints = {};
@@ -41,7 +42,7 @@ function m3ulist(url, region) {
                     if (array[i].http['user-agent']) {
                         tv.behaviorHints.proxyHeaders.request['User-Agent'] = array[i].http['user-agent'];
                     }
-                    console.log(tv);
+                    //console.log(tv);
                 }
 
                 arr.push(tv);
@@ -56,7 +57,7 @@ function m3ulist(url, region) {
 async function catalog(region, url) {
     console.log(region)
     if (region == "customiptv") {
-        if (cache.get(url)) {
+        if (cache.get(url) !== undefined) {
             return cache.get(url);
         } else {
             var cat = await (m3ulist(url, region));
@@ -66,7 +67,7 @@ async function catalog(region, url) {
             return cat;
         }
     } else {
-        if ( cache.get(region)) {
+        if ( cache.get(region) !== undefined) {
             return  cache.get(region);
         } else {
             var cat = await (getm3u(region));
