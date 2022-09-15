@@ -11,24 +11,15 @@
     "resources": [
 		{
             "name": "stream",
-            "types": [
-				"tv"
-            ],
-            "idPrefixes": [
-				"iptv_id:"
-            ]
+            "types": ["tv"]
         }, 
 		{
 			"name": "meta",
-			"types": [
-               "tv"
-            ],
-			"idPrefixes": ["iptv_id:"]
+            "types": ["tv"]
 		}
     ],
-    "types": [
-		"tv"
-    ],
+    "types": ["tv"],
+    "idPrefixes": ["stremio_iptv_id:"],
     "behaviorHints": {
         "configurable": true,
         "configurationRequired": false

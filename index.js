@@ -63,7 +63,7 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 		manifest.catalogs[c] = {
 			"type": "tv",
 
-			"id": "iptv_id:customiptv",
+			"id": "stremio_iptv_id:customiptv",
 
 			"name": "Custom IPTV"
 		};
@@ -75,7 +75,7 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 		manifest.catalogs[c] = {
 			"type": "tv",
 
-			"id": "iptv_id:" +providors[i],
+			"id": "stremio_iptv_id:" +providors[i],
 
 			"name": regions[providors[i]].name
 		};
