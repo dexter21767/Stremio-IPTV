@@ -47,6 +47,7 @@ app.get('/manifest.json', (_, res) => {
 
 
 app.get('/:configuration?/manifest.json', (req, res) => {
+	const catalog = [];
 	var providors = req.params.configuration.split('|')[0].split('=');
 
 	if (providors.length > 1 && providors[1].length > 1) {
@@ -55,32 +56,29 @@ app.get('/:configuration?/manifest.json', (req, res) => {
 		providors.length = 0;
 	}
 	var costumURL = atob(req.params.configuration.split('|')[1].split('=')[1]);
-	var c = 0;
+
 
 	if (costumURL) {
-		manifest.catalogs[c] = {
+		catalog.push({
 			"type": "tv",
 
 			"id": "stremio_iptv_id:customiptv",
 
 			"name": "Custom IPTV"
-		};
-		c++;
+		});
 	}
 
 	for (let i = 0; i < providors.length; i++) {
-
-		manifest.catalogs[c] = {
+		catalog.push({
 			"type": "tv",
 
 			"id": "stremio_iptv_id:" + providors[i],
 
 			"name": regions[providors[i]].name
-		};
-		c++;
+		});
 	};
 
-
+	manifest.catalogs = catalog;
 	res.setHeader('Cache-Control', 'max-age=86400,staleRevalidate=stale-while-revalidate, staleError=stale-if-error, public');
 	res.setHeader('Content-Type', 'application/json');
 	res.send(manifest);
