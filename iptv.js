@@ -19,6 +19,7 @@ function ConfigCache(config) {
 
             if (providors && providors[1] && providors[1].length>1) {
                 providors = providors[1].split(',');
+                providors = [...new Set(providors)];
             } else {
                 providors = null;
             }
