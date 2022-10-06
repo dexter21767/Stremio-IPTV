@@ -3,9 +3,8 @@ const axios = require('axios').default;
 const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 const configCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
-
-
 const regions = require('./regions.json');
+
 function ConfigCache(config) {
     if (config !== undefined) {
 
@@ -44,6 +43,7 @@ function ConfigCache(config) {
         return configuration
     }
 }
+
 async function getm3u(region) {
     console.log("region", region);
     if (regions[region]) {
@@ -144,7 +144,6 @@ async function meta(id, url) {
     let meta = {
         name: iptv.name,
         id: iptv.id,
-        name: iptv.name,
         type: "tv",
         background: iptv.background
     };
@@ -158,7 +157,7 @@ async function stream(id, url) {
 
     let stream = {
         name: iptv.name,
-        description: iptv.name,
+        description: "IPTV by dexter21767",
         url: iptv.url
     };
     if (iptv["behaviorHints"]) {
