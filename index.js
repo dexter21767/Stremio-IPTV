@@ -107,7 +107,7 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 	else if (resource == "meta") {
 		if ((type == "tv")) {
 			console.log("meta", id);
-			iptv.meta(id, costumeLists[region] ? atob(costumeLists[region].url) : costumeLists[region].url)
+			iptv.meta(id, costumeLists[region] ? atob(costumeLists[region].url) : '')
 				.then((meta) => {
 					console.log(meta)
 					res.send(JSON.stringify({ meta }));
@@ -119,7 +119,7 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 	else if (resource == "stream") {
 		if ((type == "tv")) {
 			console.log("stream", id);
-			iptv.stream(id, costumeLists[region] ? atob(costumeLists[region].url) : costumeLists[region].url)
+			iptv.stream(id, costumeLists[region] ? atob(costumeLists[region].url) : '')
 				.then((stream) => {
 					console.log(stream)
 					res.send(JSON.stringify({ streams: stream }));

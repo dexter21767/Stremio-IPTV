@@ -17,12 +17,12 @@ function ConfigCache(config) {
             providors = providors.split('=');
             costume = costume.split('=');
 
-            if (providors && providors[1] && providors[1].length) {
+            if (providors && providors[1] && providors[1].length>1) {
                 providors = providors[1].split(',');
             } else {
                 providors = null;
             }
-            if (costume && costume[1] && costume[1].length) {
+            if (costume && costume[1] && costume[1].length>1) {
                 costume = costume[1].split(',');
                 for (let i = 0; i < costume.length; i++) {
                     let [id, name, url] = costume[i].split(":")
