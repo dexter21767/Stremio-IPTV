@@ -259,15 +259,8 @@ onMounted(() => {
 
 
 function generateInstallUrl() {
-    /*
+    
     state.isDisabled = false;
-    console.log(state.lists.id);
-    console.log(state.lists.name);
-    const configuration = state.lists.id && state.lists.name ? '/' + state.lists.id : '';
-    const location = window.location.host + configuration + '/manifest.json'
-    document.getElementById("install_button").href = 'stremio://' + location;
-    console.log('location', location);
-    */
     var providers = [];
     var regionsArray = [];
     var costumArray = [];
