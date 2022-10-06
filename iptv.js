@@ -2,14 +2,54 @@ const parser = require('iptv-playlist-parser');
 const axios = require('axios').default;
 const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
+const configCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
 
 const regions = require('./regions.json');
+function ConfigCache(config) {
+    if (config !== undefined) {
 
+        var configuration = configCache.get(config);
+        if (!configuration || configuration == undefined) {
+            config = atob(config)
+            var [providors, costume] = config.split('|');
+            var costumeLists = {};
+            providors = providors.split('=');
+            costume = costume.split('=');
+
+            if (providors && providors[1]) {
+                providors = providors[1].split(',');
+            } else {
+                providors = null;
+            }
+            if (costume && costume[1]) {
+                costume = costume[1].split(',');
+                for (let i = 0; i < costume.length; i++) {
+                    let [id, name, url] = costume[i].split(":")
+                    costumeLists[id] = { id: id, name: name, url: url };
+                };
+            } else {
+                costume = null;
+            }
+            configuration = { providors: providors, costume: costume, costumeLists: costumeLists }
+            if (configuration && configuration.length > 1) {
+                console.log('caching config ...')
+                configCache.set(config, configuration);
+                console.log('done caching config')
+            }
+        } else {
+            console.log('config already cached')
+        }
+        return configuration
+    }
+}
 async function getm3u(region) {
     console.log("region", region);
-    url = regions[region].url;
-    return await m3ulist(url, region)
+    if (regions[region]) {
+        url = regions[region].url;
+        return await m3ulist(url, region)
+    }
+    return
 }
 function m3ulist(url, region) {
     if (url) {
@@ -20,7 +60,7 @@ function m3ulist(url, region) {
             for (i = 0; i < array.length; i++) {
 
                 let tv = {
-                    id: "iptv_id:" + region + ":" + i,
+                    id: "stremio_iptv_id:" + region + ":" + i,
                     name: array[i].name,
                     type: "tv",
                     poster: array[i].tvg.logo,
@@ -51,30 +91,36 @@ function m3ulist(url, region) {
     }
 }
 async function get_iptv(region, url) {
-    if (region == "customiptv") {
-        if (cache.get(url) !== undefined) {
-            var iptv = cache.get(url);
-        } else {
+    if (url) {
+        var iptv = cache.get(url);
+        if (!iptv || iptv == undefined) {
             var iptv = await (m3ulist(url, region));
-            if (iptv.length > 1) {
+            if (iptv && iptv.length > 1) {
+                console.log('caching ...')
                 cache.set(url, iptv);
+                console.log('done caching')
             }
+        } else {
+            console.log('already cached')
         }
     } else {
-        if (cache.get(region) !== undefined) {
-            var iptv = cache.get(region);
-        } else {
+        var iptv = cache.get(region);
+        if (!iptv || iptv == undefined) {
             var iptv = await (getm3u(region));
-            if (iptv.length > 1) {
+            if (iptv && iptv.length > 1) {
+                console.log('caching ...')
                 cache.set(region, iptv);
+                console.log('done caching')
             }
+        } else {
+            console.log('already cached')
         }
     }
     return iptv;
 }
 
 async function catalog(region, url) {
-    console.log(region)
+    console.log("region", region, "url", url)
     const metas = [];
     var iptv = await get_iptv(region, url).catch(error => console.error(error));
     for (let i = 0; i < iptv.length; i++) {
@@ -123,5 +169,6 @@ async function stream(id, url) {
 module.exports = {
     catalog,
     meta,
-    stream
+    stream,
+    ConfigCache
 };

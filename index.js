@@ -2,16 +2,19 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const path = require('path');
 
 const iptv = require("./iptv");
-
 var manifest = require("./manifest.json");
-
 const regions = require('./regions.json');
 
-const landingTemplate = require('./landingTemplate');
+app.set('trust proxy', true)
+
+app.use('/configure', express.static(path.join(__dirname, 'vue', 'dist')));
+app.use('/assets', express.static(path.join(__dirname, 'vue', 'dist', 'assets')));
 
 app.use(cors())
+
 
 
 app.get('/', (_, res) => {
@@ -21,64 +24,54 @@ app.get('/', (_, res) => {
 
 
 app.get('/:configuration?/configure', (_, res) => {
+	res.setHeader('Cache-Control', 'max-age=86400,staleRevalidate=stale-while-revalidate, staleError=stale-if-error, public');
 	res.setHeader('content-type', 'text/html');
-	res.end(landingTemplate());
+	res.sendFile(path.join(__dirname, 'vue', 'dist', 'index.html'));
 });
 
 
 app.get('/manifest.json', (_, res) => {
-	var i = 0;
-	for (let region in regions) {
-		manifest.catalogs[i] = {
-			"type": "tv",
-
-			"id": "stremio_iptv_id:" + region,
-
-			"name": regions[region].name
-		};
-		i++;
-	};
-
-	res.setHeader('Cache-Control', 'max-age=86400,staleRevalidate=stale-while-revalidate, staleError=stale-if-error, public');
+	res.setHeader('Cache-Control', 'max-age=86400, public');
 	res.setHeader('Content-Type', 'application/json');
+	manifest.catalogs = [];
+	manifest.behaviorHints.configurationRequired = true;
 	res.send(manifest);
 	res.end();
 });
 
 
-app.get('/:configuration?/manifest.json', (req, res) => {
-	const catalog = [];
-	var providors = req.params.configuration.split('|')[0].split('=');
+app.get('/:configuration/manifest.json', (req, res) => {
+	//let manifesto = manifest;
+	manifest.catalogs = [];
+	configuration = atob(req.params.configuration)
+	let { providors, costume, costumeLists } = iptv.ConfigCache(req.params.configuration)
+	if (costume) {
+		for (let i = 0; i < costume.length; i++) {
+			let [id, name, url] = costume[i].split(":")
+			manifest.catalogs.push({
+				"type": "tv",
 
-	if (providors.length > 1 && providors[1].length > 1) {
-		providors = providors[1].split(',');
-	} else {
-		providors.length = 0;
+				"id": "stremio_iptv_id:" + id,
+
+				"name": name
+			});
+		};
 	}
-	var costumURL = atob(req.params.configuration.split('|')[1].split('=')[1]);
+	if (providors)
+		for (let i = 0; i < providors.length; i++) {
+			manifest.catalogs.push({
+				"type": "tv",
 
+				"id": "stremio_iptv_id:" + providors[i],
 
-	if (costumURL) {
-		catalog.push({
-			"type": "tv",
+				"name": regions[providors[i]].name
+			});
+		};
 
-			"id": "stremio_iptv_id:customiptv",
-
-			"name": "Custom IPTV"
-		});
-	}
-
-	for (let i = 0; i < providors.length; i++) {
-		catalog.push({
-			"type": "tv",
-
-			"id": "stremio_iptv_id:" + providors[i],
-
-			"name": regions[providors[i]].name
-		});
-	};
-
-	manifest.catalogs = catalog;
+	//console.log(catalog)
+	//manifesto.catalogs = catalog;	
+	console.log(manifest.catalogs)
+	manifest.behaviorHints.configurationRequired = false;
 	res.setHeader('Cache-Control', 'max-age=86400,staleRevalidate=stale-while-revalidate, staleError=stale-if-error, public');
 	res.setHeader('Content-Type', 'application/json');
 	res.send(manifest);
@@ -91,27 +84,20 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 	res.setHeader('Cache-Control', 'max-age=86400,staleRevalidate=stale-while-revalidate, staleError=stale-if-error, public');
 	res.setHeader('Content-Type', 'application/json');
 
+
+
 	console.log(req.params);
 	let { configuration, resource, type, id } = req.params;
+	let { providors, costume, costumeLists } = iptv.ConfigCache(configuration)
 
-	if (configuration !== undefined) {
-		var providors = configuration.split('|')[0].split('=')
-		if (providors.length > 1 && providors[1].length > 1) {
-			providors = providors[1].split(',');
-		} else {
-			providors.length = 0;
-		}
-		if (configuration.split('|')[1].split('=').length > 1) {
-			var costumURL = atob(configuration.split('|')[1].split('=')[1]);
-		}
-	}
+	console.log("costume", costume)
 
+	let region = id.split(":")[1];
 	if (resource == "catalog") {
 		if ((type == "tv")) {
-			region = id.split(":")[1];
 			console.log('id', id)
 			console.log("catalog", region);
-			iptv.catalog(region, costumURL)
+			iptv.catalog(region, costumeLists[region] ? atob(costumeLists[region].url) : '')
 				.then((metas) => {
 					res.send(JSON.stringify({ metas }));
 					res.end();
@@ -121,8 +107,7 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 	else if (resource == "meta") {
 		if ((type == "tv")) {
 			console.log("meta", id);
-			console.log('costumURL', costumURL);
-			iptv.meta(id, costumURL)
+			iptv.meta(id, costumeLists[region] ? atob(costumeLists[region].url) : costumeLists[region].url)
 				.then((meta) => {
 					console.log(meta)
 					res.send(JSON.stringify({ meta }));
@@ -134,7 +119,7 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 	else if (resource == "stream") {
 		if ((type == "tv")) {
 			console.log("stream", id);
-			iptv.stream(id, costumURL)
+			iptv.stream(id, costumeLists[region] ? atob(costumeLists[region].url) : costumeLists[region].url)
 				.then((stream) => {
 					console.log(stream)
 					res.send(JSON.stringify({ streams: stream }));

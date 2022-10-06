@@ -1,8 +1,8 @@
 {
 	"id": "community.stremio-iptv",
-    "version": "0.0.6",
+    "version": "0.1.0",
     "name": "Stremio IPTV by dexter21767",
-    "description": "Addon for Internation TV channles (maintained by the community) huge thanks for u/RootByte for the lists.",
+    "description": "Addon for Internation TV channles (based on iptv.org) huge thanks for u/RootByte.",
     "logo": "https://i.imgur.com/982WZT3.png",
 	"background":"https://github.com/Stremio/stremio-art/raw/main/originals/Jesiel%20Rocha%20Lofhagen.png",
     "contactEmail": "ahmidiyasser@gmail.com",
@@ -11,17 +11,18 @@
     "resources": [
 		{
             "name": "stream",
-            "types": ["tv"]
+            "types": ["tv"],
+            "idPrefixes": ["stremio_iptv_id:"]
         }, 
 		{
 			"name": "meta",
-            "types": ["tv"]
+            "types": ["tv"],
+            "idPrefixes": ["stremio_iptv_id:"]
 		}
     ],
     "types": ["tv"],
-    "idPrefixes": ["stremio_iptv_id:"],
     "behaviorHints": {
         "configurable": true,
-        "configurationRequired": false
+        "configurationRequired": true
     }
 }
