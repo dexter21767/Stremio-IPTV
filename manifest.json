@@ -2,7 +2,7 @@
 	"id": "community.stremio-iptv",
     "version": "0.1.0",
     "name": "Stremio IPTV by dexter21767",
-    "description": "Addon for Internation TV channles (based on iptv.org) huge thanks for u/RootByte.",
+    "description": "Addon for International (country specific) TV channels! Huge thanks for iptv.org and u/RootByte!",
     "logo": "https://i.imgur.com/982WZT3.png",
 	"background":"https://github.com/Stremio/stremio-art/raw/main/originals/Jesiel%20Rocha%20Lofhagen.png",
     "contactEmail": "ahmidiyasser@gmail.com",
