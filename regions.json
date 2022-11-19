@@ -1,5 +1,13 @@
 {
-	"beiniptv": {
+	"maxiptv": {
+		"name": "MaxTV",
+		"url": "https://bit.ly/3Oiqpa5",
+		"id": "maxiptv"
+	},"maxspiptv": {
+		"name": "MaxTV Spanish",
+		"url": "https://bit.ly/3V8lryX",
+		"id": "maxspiptv"
+	},"beiniptv": {
 		"name": "bein sports",
 		"url": "https://bit.ly/3eUaJfI",
 		"id": "beiniptv"

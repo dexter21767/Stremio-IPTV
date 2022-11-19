@@ -53,7 +53,9 @@ app.get('/:configuration/manifest.json', (req, res) => {
 
 				"id": "stremio_iptv_id:" + id,
 
-				"name": name
+				"name": name,
+
+				extra: [{ name: "search", isRequired: false }]
 			});
 		};
 	}
@@ -64,7 +66,9 @@ app.get('/:configuration/manifest.json', (req, res) => {
 
 				"id": "stremio_iptv_id:" + providors[i],
 
-				"name": regions[providors[i]].name
+				"name": regions[providors[i]].name,
+
+				extra: [{ name: "search", isRequired: false }]
 			});
 		};
 
@@ -79,7 +83,7 @@ app.get('/:configuration/manifest.json', (req, res) => {
 });
 
 
-app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
+app.get('/:configuration?/:resource(catalog|meta|stream)/:type/:id/:extra?.json', (req, res) => {
 
 	res.setHeader('Cache-Control', 'max-age=86400,staleRevalidate=stale-while-revalidate, staleError=stale-if-error, public');
 	res.setHeader('Content-Type', 'application/json');
@@ -87,27 +91,39 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 
 
 	console.log(req.params);
-	let { configuration, resource, type, id } = req.params;
+	let { configuration, resource, type, id} = req.params;
+	let extra =  Object.fromEntries(new URLSearchParams(req.params.extra));
 	let { providors, costume, costumeLists } = iptv.ConfigCache(configuration)
-
+	console.log(extra)
 	console.log("costume", costume)
 
 	let region = id.split(":")[1];
+	let costumeList = costumeLists[region] ? atob(costumeLists[region].url) : '';
+
 	if (resource == "catalog") {
 		if ((type == "tv")) {
 			console.log('id', id)
 			console.log("catalog", region);
-			iptv.catalog(region, costumeLists[region] ? atob(costumeLists[region].url) : '')
+			if(extra && extra.search){
+				console.log("search", extra.search);
+				iptv.search(region, costumeList,extra.search)
 				.then((metas) => {
 					res.send(JSON.stringify({ metas }));
 					res.end();
 				}).catch(error => console.error(error));
+			}else{
+			iptv.catalog(region, costumeList)
+				.then((metas) => {
+					res.send(JSON.stringify({ metas }));
+					res.end();
+				}).catch(error => console.error(error));
+			}
 		}
 	}
 	else if (resource == "meta") {
 		if ((type == "tv")) {
 			console.log("meta", id);
-			iptv.meta(id, costumeLists[region] ? atob(costumeLists[region].url) : '')
+			iptv.meta(id, costumeList)
 				.then((meta) => {
 					console.log(meta)
 					res.send(JSON.stringify({ meta }));
@@ -119,7 +135,7 @@ app.get('/:configuration?/:resource/:type/:id.json', (req, res) => {
 	else if (resource == "stream") {
 		if ((type == "tv")) {
 			console.log("stream", id);
-			iptv.stream(id, costumeLists[region] ? atob(costumeLists[region].url) : '')
+			iptv.stream(id, costumeList)
 				.then((stream) => {
 					console.log(stream)
 					res.send(JSON.stringify({ streams: stream }));

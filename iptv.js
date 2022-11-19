@@ -136,6 +136,31 @@ async function catalog(region, url) {
     return metas;
 }
 
+async function search(region, url,param) {
+    try{
+    console.log("region", region, "url", url)
+    const metas = [];
+    var iptv = await get_iptv(region, url).catch(error => console.error(error));
+    if(!iptv) throw "error getting data";
+    
+    for (let i = 0; i < iptv.length; i++) {
+        if(iptv[i].name.toLowerCase().match(param.toLowerCase())){
+        metas.push({
+            id: iptv[i].id,
+            name: iptv[i].name,
+            type: "tv",
+            poster: iptv[i].poster,
+            posterShape: 'landscape'
+        });
+        }
+    }
+    return metas;
+}
+catch(e){
+    console.error(e);
+}
+}
+
 async function meta(id, url) {
     var region = id.split(":")[1];
     id = id.split(":")[2];
@@ -162,12 +187,15 @@ async function stream(id, url) {
     };
     if (iptv["behaviorHints"]) {
         stream["behaviorHints"] = iptv["behaviorHints"];
+    }else if(region.match("max")){
+     //   stream["behaviorHints"]= {"notWebReady":true,"proxyHeaders":{"request":{'User-Agent':"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36"}}};
     }
     return [stream];
 }
 
 module.exports = {
     catalog,
+    search,
     meta,
     stream,
     ConfigCache
