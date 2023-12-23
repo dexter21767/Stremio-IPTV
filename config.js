@@ -5,11 +5,11 @@ var config = {}
 switch (env) {
     case 'beamup':
 		config.port = process.env.PORT
-        config.local = "https://2ecbbd610840-stremio-iptv.baby-beamup.club/manifest.json"
+        config.local = "https://ryann-devv.github.io/Stremio-IPTV/manifest.json"
         break;
 
     case 'local':
-		config.port = 63355
+		config.port = 11470
         config.local = "http://127.0.0.1:" + config.port;
         break;
 }
